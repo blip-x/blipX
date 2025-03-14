@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 
@@ -37,5 +37,44 @@ export const get = query({
         
         const shapes = await ctx.db.query("shapes").withIndex("by_room_id", q => q.eq("roomId", room._id)).collect();
         return shapes;
+    }
+});
+
+export const create = mutation({
+    args: {
+        body: v.string(),
+        roomId: v.id("rooms"),
+        workspaceId: v.id("workspaces"),
+        memberId: v.id("members"),
+        conversationId: v.optional(v.id("conversations"))
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx);
+        if(!userId) {
+            throw new Error("Unauthenticated");
+        }
+
+        if(!args.body.trim().length) {
+            throw new Error("Shape is required");
+        }
+
+        const member = await ctx.db.query("members").withIndex("By_workspace_id_user_id", q => q.eq("workspaceId", args.workspaceId).eq("userId", userId)).unique();
+        if(!member || member._id !== args.memberId) {
+            throw new Error("Unauthenticated");
+        }
+
+        const room = await ctx.db.get(args.roomId);
+        if(!room) {
+            throw new Error("Room not exist!");
+        }
+
+        const shapeId = await ctx.db.insert("shapes", {
+            body: args.body,
+            roomId: room._id,
+            workspaceId: args.workspaceId,
+            memberId: member._id,
+            conversationId: args.conversationId
+        });
+        return shapeId;
     }
 });
