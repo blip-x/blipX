@@ -3,16 +3,16 @@ import { Id } from "../../../../convex/_generated/dataModel"
 import { api } from "../../../../convex/_generated/api";
 
 interface Props {
-    roomId: Id<"rooms">,
-    workSpaceId: Id<"workspaces">,
-    conversationId: Id<"conversations">
+    roomId?: Id<"rooms">,
+    workspaceId?: Id<"workspaces">,
+    conversationId?: Id<"conversations">
 }
-export const useGetMessage = ({
+export const useGetShapes = ({
   roomId,
-  workSpaceId,
+  workspaceId,
   conversationId
 }: Props) => {
-  const data = useQuery(api.messages.getById, { id });
+  const data = useQuery(api.shapes.get, { roomId, workspaceId, conversationId });
   const isLoading = data === undefined;
   return { data, isLoading };
 }
