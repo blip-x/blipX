@@ -33,6 +33,15 @@ type shape =
       memberId: Id<"members">;
     };
 
+type Data = {
+    _id: Id<"shapes">;
+    _creationTime: number;
+    conversationId?: Id<"conversations"> | undefined;
+    workspaceId: Id<"workspaces">;
+    body: string;
+    memberId: Id<"members">;
+    roomId: Id<"rooms">;
+}[] | null | undefined;
 export class Game {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -52,13 +61,15 @@ export class Game {
   private radius = 0;
   private figure: shape | null = null;
   private inputpoint: number[][] = [];
+  private getShapes: () => {data: Data, isLoading: boolean}
 
   constructor(
     canvas: HTMLCanvasElement,
     roomId: Id<"rooms">,
     workspaceId: Id<"workspaces">,
     memberId: Id<"members">,
-    conversationId?: Id<"conversations">
+	getShapes: () => {data: Data, isLoading: boolean},
+    conversationId?: Id<"conversations">,
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
@@ -69,6 +80,7 @@ export class Game {
     this.clicked = false;
     this.selectedTool = Tools.SQUARE;
     this.init();
+	this.getShapes = getShapes;
     // this.initHandlers();
     this.clearCanvas(); // Calling after it's defined
     this.initMouseHandlers();
@@ -130,11 +142,7 @@ export class Game {
 
   // Initialize the shapes from the backend
   async init() {
-    const { data, isLoading } = await useGetShapes({
-      roomId: this.roomId,
-      workspaceId: this.workspaceId,
-      conversationId: this.conversationId,
-    });
+    const { data, isLoading } = await this.getShapes();
 
     if (!data?.length || isLoading) {
       this.existingShape = [];
