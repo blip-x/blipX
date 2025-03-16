@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import IconButton from "./IconButton";
 import { ArrowBigLeft, Circle, Pen, Square } from 'lucide-react'
 import { Game } from "../Draw/Game";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 export enum Tools {
     PEN = "pen",
@@ -9,7 +10,7 @@ export enum Tools {
     SQUARE = "ract",
     Line = "line"
 }
-const Canvas = ({ roomId }: { roomId: string }) => {
+const Canvas = ({ roomId, workspaceId, memberId }: { roomId: Id<"rooms">, workspaceId: Id<"workspaces">, memberId: Id<"members"> }) => {
     const [selectedTool, setSelectedTool] = useState<Tools>(Tools.PEN);
     const [game, setGame] = useState<Game>();
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,13 +18,13 @@ const Canvas = ({ roomId }: { roomId: string }) => {
     useEffect(() => {
         if (canvasRef.current) {
             const canvas = canvasRef.current;
-            const g = new Game(canvas, roomId)
+            const g = new Game(canvas, roomId, workspaceId, memberId);
             setGame(g);
             return () => {
-                g.destroye()
+                g.destroy()
             }
         }
-    }, [canvasRef])
+    }, [canvasRef, roomId, workspaceId, memberId])
 
     useEffect(() => {
         console.log(selectedTool)
