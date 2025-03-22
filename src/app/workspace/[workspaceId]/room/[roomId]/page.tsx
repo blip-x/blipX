@@ -18,6 +18,6 @@ export default function RoomIdPage({
     }
 
     return (
-        <Canvas roomId={roomId} workspaceId={workspaceId} memberId={currentMember?._id} />
+        <Canvas roomId={roomId} workspaceId={workspaceId} memberId={currentMember?._id}  />
     )
 }

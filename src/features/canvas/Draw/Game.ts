@@ -61,14 +61,14 @@ export class Game {
   private radius = 0;
   private figure: shape | null = null;
   private inputpoint: number[][] = [];
-  private getShapes: () => {data: Data, isLoading: boolean}
+  private getShapes: () => Promise<{data: Data, isLoading: boolean}>
 
   constructor(
     canvas: HTMLCanvasElement,
     roomId: Id<"rooms">,
     workspaceId: Id<"workspaces">,
     memberId: Id<"members">,
-	getShapes: () => {data: Data, isLoading: boolean},
+	  getShapes: () => Promise<{data: Data, isLoading: boolean}>,
     conversationId?: Id<"conversations">,
   ) {
     this.canvas = canvas;
@@ -80,7 +80,7 @@ export class Game {
     this.clicked = false;
     this.selectedTool = Tools.SQUARE;
     this.init();
-	this.getShapes = getShapes;
+	  this.getShapes = getShapes;
     // this.initHandlers();
     this.clearCanvas(); // Calling after it's defined
     this.initMouseHandlers();
@@ -275,16 +275,15 @@ export class Game {
 
     // Call the backend to save the shape
     const { mutate } = useCreateShape();
-    mutate(
-      {
-        body: JSON.stringify(this.figure),
+    const data = {
+      body: JSON.stringify(this.figure),
         roomId: this.roomId,
         workspaceId: this.workspaceId,
         memberId: this.memberId,
         conversationId: this.conversationId,
-      },
-      { throwError: true }
-    );
+    }
+    // calll the
+    
     this.clearCanvas();
   };
 

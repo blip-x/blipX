@@ -4,12 +4,24 @@ import { ArrowBigLeft, Circle, Pen, Square } from "lucide-react";
 import { Game } from "../Draw/Game";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { useGetShapes } from "../api/use-get-shapes";
+import { useCreateShape } from "../api/use-create-shape";
 
 export enum Tools {
 	PEN = "pen",
 	CIRCLE = "circle",
 	SQUARE = "ract",
 	Line = "line",
+}
+
+export interface Data {
+	_id: Id<"shapes">;
+	_creationTime: number;
+	conversationId ?: Id<"conversations"> | undefined;
+	workspaceId: Id<"workspaces">;
+	body: string;
+	memberId: Id <"members">;
+	roomId: Id <"rooms">;
+
 }
 const Canvas = ({
 	roomId,
@@ -24,17 +36,26 @@ const Canvas = ({
 	const [game, setGame] = useState<Game>();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
-	async function getShapes() {
+
+	async function getShapes():Promise<{data: Data[] | null | undefined, isLoading: boolean}> {
 		const { data, isLoading } = await useGetShapes({
 			roomId: roomId,
 			workspaceId: workspaceId,
 		});
         return {data, isLoading};
 	}
+
+	async function createShapes(shape:any){
+		const { mutate } = useCreateShape();
+			mutate(
+			  shape,
+			  { throwError: true }
+		);
+	}
 	useEffect(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
-			const g = new Game(canvas, roomId, workspaceId, memberId, getShapes);
+			const g = new Game(canvas, roomId, workspaceId, memberId, getShapes!);
 			setGame(g);
 			return () => {
 				g.destroy();

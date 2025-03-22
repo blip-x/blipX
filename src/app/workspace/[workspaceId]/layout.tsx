@@ -9,18 +9,21 @@ import { Loader } from "lucide-react";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { Thread } from "@/features/message/components/thread";
 import { Profile } from "@/features/member/components/profile";
+import { useParams, usePathname } from "next/navigation";
 
 interface Props {
   children: React.ReactNode
 }
 const WorkspaceIdLayout = ({ children }: Props) => {
   const { parentMessageId, profileMemberId, onClose } = usePanel();
+  const path = usePathname();
+  const showCanvas = JSON.stringify(path).includes("room");
 
   const showPanel = !!parentMessageId || !!profileMemberId;
   return ( 
     <div className="h-full">
-      <Toolbar />
-      <div className="flex h-[calc(100vh-40px)]">
+      {!showCanvas && <Toolbar />}
+      {!showCanvas && <div className="flex h-[calc(100vh-40px)]">
         <Sidebar />
         <ResizablePanelGroup 
           direction="horizontal"
@@ -63,7 +66,10 @@ const WorkspaceIdLayout = ({ children }: Props) => {
             </>
           )}
         </ResizablePanelGroup>
-      </div>
+      </div>}
+      {showCanvas &&
+        <div>{children}</div>
+      }
     </div>
   );
 }
