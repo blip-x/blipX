@@ -21,6 +21,8 @@ import { useCurrentMember } from "@/features/member/api/use-current-member";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useCurrentRoom } from "@/features/room/api/use-current-room";
+import { useCreateRoom } from "@/features/room/api/use-create-room";
 
 interface HeaderProps {
 	title: string;
@@ -37,11 +39,13 @@ export const Header = ({ title }: HeaderProps) => {
 			"This will permanently delete this channel. This action is irreversible.",
 	});
 	const { data: member } = useCurrentMember({ workspaceId });
+	const { data: room } = useCurrentRoom({ workspaceId });
+
 	const { mutate: updateChannel, isPending: isUpdatingChannel } =
 		useUpdateChannel();
 	const { mutate: removeChannel, isPending: isRemovingChannel } =
 		useRemoveChannel();
-
+	const { mutate: createRoom, isPending: isRoomCreating } = useCreateRoom();
 	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value.replace(/\s+/g, "-").toLowerCase();
 		setValue(value);
@@ -49,6 +53,22 @@ export const Header = ({ title }: HeaderProps) => {
 	function handleEditClose(value: boolean) {
 		if (member?.role !== "admin") return;
 		setEditOpen(value);
+	}
+	function handleCreateRoom() {
+		createRoom(
+			{
+				workspaceId,
+			},
+			{
+				onSuccess: (response) => {
+					toast.success("Channel created successfully");
+					router.push(`/workspace/${workspaceId}/room/${response}`);
+				},
+				onError: () => {
+					toast.error("Failed to create channel");
+				},
+			}
+		);
 	}
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -159,12 +179,18 @@ export const Header = ({ title }: HeaderProps) => {
 					</div>
 				</DialogContent>
 			</Dialog>
-			<Link
-				href={`/workspace/${workspaceId}/room/m17bnaq0cwp35aryhhdq0xqbz17ck1sn`}
-				className="flex items-center gap-x-2"
-			>
-				<Button size={"sm"}>W</Button>
-			</Link>
+			{room ? (
+				<Link
+					href={`/workspace/${workspaceId}/room/${room._id}`}
+					className="flex items-center gap-x-2"
+				>
+					<Button size={"sm"}>Join</Button>
+				</Link>
+			) : (
+				<Button size={"sm"} onClick={handleCreateRoom}>
+					Create
+				</Button>
+			)}
 		</div>
 	);
 };
