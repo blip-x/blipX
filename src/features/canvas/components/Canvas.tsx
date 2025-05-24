@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import IconButton from "./IconButton";
-import { ArrowBigLeft, Circle, MousePointer, Pen, Square } from "lucide-react";
+import {
+	ArrowBigLeft,
+	Circle,
+	Eraser,
+	MousePointer,
+	Pen,
+	Square,
+} from "lucide-react";
 import { Game } from "../Draw/Game";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { useGetShapes } from "../api/use-get-shapes";
@@ -15,6 +22,7 @@ export enum Tools {
 	SQUARE = "ract",
 	Line = "line",
 	SELECTION = "selection",
+	ERASER = "eraser",
 }
 
 interface Props {
@@ -39,6 +47,15 @@ type RequestType = {
 	memberId: Id<"members">;
 	conversationId?: Id<"conversations">;
 };
+
+type UpdateShapeType = {
+	body: string;
+	id: Id<"shapes">;
+};
+type DeleteShapeType = {
+	id: Id<"shapes">;
+};
+
 type ResponseType = Id<"shapes"> | null;
 type Options = {
 	onSuccess?: (response: ResponseType) => void;
@@ -61,6 +78,8 @@ const Canvas = ({
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [shapes, setShapes] = useState<any[] | null | undefined>([]);
 	const mutation = useMutation(api.shapes.create);
+	const updateMutation = useMutation(api.shapes.updateById);
+	const deleteMutation = useMutation(api.shapes.deleteById);
 
 	const mutate = useCallback(
 		async (values: RequestType, options?: Options) => {
@@ -78,6 +97,40 @@ const Canvas = ({
 			}
 		},
 		[mutation]
+	);
+	const updateMutate = useCallback(
+		async (values: UpdateShapeType, options?: Options) => {
+			try {
+				const response = await updateMutation(values);
+				options?.onSuccess?.(response as ResponseType);
+				return response;
+			} catch (error) {
+				// setStatus("error");
+				options?.onError?.(error as Error);
+				if (options?.throwError) throw error;
+			} finally {
+				// setStatus("settled");
+				options?.onSettled?.();
+			}
+		},
+		[updateMutation]
+	);
+	const deleteMutate = useCallback(
+		async (values: DeleteShapeType, options?: Options) => {
+			try {
+				const response = await deleteMutation(values);
+				options?.onSuccess?.(response as ResponseType);
+				return response;
+			} catch (error) {
+				// setStatus("error");
+				options?.onError?.(error as Error);
+				if (options?.throwError) throw error;
+			} finally {
+				// setStatus("settled");
+				options?.onSettled?.();
+			}
+		},
+		[deleteMutation]
 	);
 	const data = useQuery(api.shapes.get, {
 		roomId,
@@ -102,6 +155,14 @@ const Canvas = ({
 	async function createShapes(shape: CreateShapeType) {
 		await mutate(shape, { throwError: true });
 	}
+
+	async function updateShapes(data: UpdateShapeType) {
+		await updateMutate(data, { throwError: true });
+	}
+
+	async function deleteShapes(data: DeleteShapeType) {
+		await deleteMutate(data, { throwError: true });
+	}
 	useEffect(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
@@ -111,7 +172,9 @@ const Canvas = ({
 				workspaceId,
 				memberId,
 				getShapes,
-				createShapes
+				createShapes,
+				updateShapes,
+				deleteShapes
 			);
 			setGame(g);
 			return () => {
@@ -150,7 +213,13 @@ export function TopBar({
 }) {
 	return (
 		<div className="flex gap-2 border p-2 text-sm fixed top-2 rounded-md left-[50%] transform -translate-x-1/2  text-white">
-			<IconButton activated={selectedTool === Tools.SELECTION} icon={<MousePointer />} onClick={() => { setSelectedTool(Tools.SELECTION) }} />
+			<IconButton
+				activated={selectedTool === Tools.SELECTION}
+				icon={<MousePointer />}
+				onClick={() => {
+					setSelectedTool(Tools.SELECTION);
+				}}
+			/>
 			<IconButton
 				activated={selectedTool === Tools.PEN}
 				icon={<Pen />}
@@ -192,6 +261,13 @@ export function TopBar({
 				}
 				onClick={() => {
 					setSelectedTool(Tools.Line);
+				}}
+			/>
+			<IconButton
+				activated={selectedTool === Tools.ERASER}
+				icon={<Eraser />}
+				onClick={() => {
+					setSelectedTool(Tools.ERASER);
 				}}
 			/>
 		</div>
