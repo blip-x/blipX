@@ -2,11 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import IconButton from "./IconButton";
-import { ArrowBigLeft, Circle, Pen, Square } from "lucide-react";
+import { ArrowBigLeft, Circle, MousePointer, Pen, Square } from "lucide-react";
 import { Game } from "../Draw/Game";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { useGetShapes } from "../api/use-get-shapes";
-// import { CreateShapeType, useCreateShape } from "../api/use-create-shape";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
@@ -15,6 +14,7 @@ export enum Tools {
 	CIRCLE = "circle",
 	SQUARE = "ract",
 	Line = "line",
+	SELECTION = "selection",
 }
 
 interface Props {
@@ -61,25 +61,10 @@ const Canvas = ({
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [shapes, setShapes] = useState<any[] | null | undefined>([]);
 	const mutation = useMutation(api.shapes.create);
-	// const [data, setData] = useState<ResponseType>(null);
-	// const [error, setError] = useState<Error | null>(null);
-
-	// const [status, setStatus] = useState<
-	// 	"pending" | "settled" | "error" | "success" | null
-	// >(null);
-	// const isPending = useMemo(() => status === "pending", [status]);
-	// const isSettled = useMemo(() => status === "settled", [status]);
-	// const isError = useMemo(() => status === "error", [status]);
-	// const isSuccess = useMemo(() => status === "success", [status]);
 
 	const mutate = useCallback(
 		async (values: RequestType, options?: Options) => {
 			try {
-				// setData(null);
-				// setError(null);
-
-				// setStatus("pending");
-
 				const response = await mutation(values);
 				options?.onSuccess?.(response as ResponseType);
 				return response;
@@ -100,15 +85,6 @@ const Canvas = ({
 		// conversationId,
 	});
 	console.log(data);
-	// return {
-	// 	mutate,
-	// 	data,
-	// 	error,
-	// 	// isPending,
-	// 	// isSettled,
-	// 	// isError,
-	// 	// isSuccess,
-	// };
 	const useGetShapes = ({ roomId, workspaceId, conversationId }: Props) => {
 		const data = useQuery(api.shapes.get, {
 			roomId,
@@ -124,7 +100,6 @@ const Canvas = ({
 	}
 
 	async function createShapes(shape: CreateShapeType) {
-		// const { mutate } = useCreateShape();
 		await mutate(shape, { throwError: true });
 	}
 	useEffect(() => {
@@ -175,6 +150,7 @@ export function TopBar({
 }) {
 	return (
 		<div className="flex gap-2 border p-2 text-sm fixed top-2 rounded-md left-[50%] transform -translate-x-1/2  text-white">
+			<IconButton activated={selectedTool === Tools.SELECTION} icon={<MousePointer />} onClick={() => { setSelectedTool(Tools.SELECTION) }} />
 			<IconButton
 				activated={selectedTool === Tools.PEN}
 				icon={<Pen />}
