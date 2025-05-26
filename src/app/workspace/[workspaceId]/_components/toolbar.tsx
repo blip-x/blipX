@@ -38,7 +38,7 @@ export const Toolbar = () => {
     router.push(`/workspace/${workspaceId}/member/${memberId}`)
   }
 	return (
-		<nav className="bg-[#481349] flex items-center justify-between p-1.5 h-10">
+		<nav className="bg-[#242626]/95 flex items-center justify-between p-1.5 h-11">
 			<div className="flex-1" />
 			<div className="min-w-[280px] max-w-[642px] grow-[2] shrink">
 				<Button

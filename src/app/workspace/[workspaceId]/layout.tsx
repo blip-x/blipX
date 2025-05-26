@@ -10,6 +10,7 @@ import { Id } from "../../../../convex/_generated/dataModel";
 import { Thread } from "@/features/message/components/thread";
 import { Profile } from "@/features/member/components/profile";
 import { useParams, usePathname } from "next/navigation";
+import { useState } from "react";
 
 interface Props {
   children: React.ReactNode
@@ -32,7 +33,7 @@ const WorkspaceIdLayout = ({ children }: Props) => {
           <ResizablePanel
             defaultSize={20}
             minSize={11}
-            className="bg-[#5E2C5F]"
+            className="bg-[#242626]/95"
           >
             <WorkspaceSidebar />
           </ResizablePanel>

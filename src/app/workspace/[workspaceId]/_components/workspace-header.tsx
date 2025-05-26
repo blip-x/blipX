@@ -38,7 +38,7 @@ export const WorkspaceHeader = ({ workspace, isAdmin }: WorkspaceHeaderProps) =>
               className="font-semibold w-auto p-1.5 text-lg overflow-hidden"
               size={"sm"}
             >
-              <span className="truncate">
+              <span className="truncate text-[#f5f0f0]">
                 {workspace.name}
               </span>
               <ChevronDown className="size-4 ml-1 shrink-0"/>
