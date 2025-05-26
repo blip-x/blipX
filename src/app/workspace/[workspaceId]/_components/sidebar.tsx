@@ -14,7 +14,7 @@ export const Sidebar = () => {
 			<SidebarButton icon={MessageSquare} label="DMs" />
 			{/* <SidebarButton icon={Bell} label="Activity" /> */}
 			{/* <SidebarButton icon={MoreHorizontal} label="More" /> */}
-			<div className="flex flex-col gap-y-1 mt-auto items-center jusitfy-center ">
+			<div className="flex flex-col gap-y-1 mt-auto items-center jusitfy-center mb-2">
 				<UserButton />
 			</div>
 		</aside>
