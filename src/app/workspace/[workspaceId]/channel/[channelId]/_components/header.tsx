@@ -72,9 +72,10 @@ export const Header = ({ title }: HeaderProps) => {
 	}
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+		console.log(member?.role);
 
 		if (member?.role !== "admin") return;
-
+		console.log(member?.role);
 		updateChannel(
 			{ id: channelId, name: value },
 			{
