@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import IconButton from "./IconButton";
 import {
 	ArrowBigLeft,
+	ArrowLeft,
 	Circle,
 	Eraser,
 	MousePointer,
@@ -15,6 +16,9 @@ import { Id } from "../../../../convex/_generated/dataModel";
 import { useGetShapes } from "../api/use-get-shapes";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useWorkspaceId } from "@/hooks/use-workspace-id";
 
 export enum Tools {
 	PEN = "pen",
@@ -211,65 +215,76 @@ export function TopBar({
 	selectedTool: Tools;
 	setSelectedTool: React.Dispatch<React.SetStateAction<Tools>>;
 }) {
+	const workspaceId = useWorkspaceId();
 	return (
-		<div className="flex gap-2 border p-2 text-sm fixed top-2 rounded-md left-[50%] transform -translate-x-1/2  text-white">
-			<IconButton
-				activated={selectedTool === Tools.SELECTION}
-				icon={<MousePointer />}
-				onClick={() => {
-					setSelectedTool(Tools.SELECTION);
-				}}
-			/>
-			<IconButton
-				activated={selectedTool === Tools.PEN}
-				icon={<Pen />}
-				onClick={() => {
-					setSelectedTool(Tools.PEN);
-				}}
-			/>
-			<IconButton
-				activated={selectedTool === Tools.CIRCLE}
-				icon={<Circle />}
-				onClick={() => setSelectedTool(Tools.CIRCLE)}
-			/>
-			<IconButton
-				activated={selectedTool === Tools.SQUARE}
-				icon={<Square />}
-				onClick={() => {
-					setSelectedTool(Tools.SQUARE);
-				}}
-			/>
-			<IconButton
-				activated={selectedTool === Tools.Line}
-				icon={
-					<svg
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<line
-							x1="2"
-							y1="12"
-							x2="22"
-							y2="12"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-						/>
-					</svg>
-				}
-				onClick={() => {
-					setSelectedTool(Tools.Line);
-				}}
-			/>
-			<IconButton
-				activated={selectedTool === Tools.ERASER}
-				icon={<Eraser />}
-				onClick={() => {
-					setSelectedTool(Tools.ERASER);
-				}}
-			/>
-		</div>
+		<>
+			<div className="transition flex gap-2 p-2 text-sm fixed top-2 rounded-md left-[4%] transform -translate-x-1/2 text-white group">
+				<Link
+					href={`/workspace/${workspaceId}`}
+					className="group-hover:scale-105"
+				>
+					<ArrowLeft className="group-hover:scale-200 group-hover:text-rose-600"/>
+				</Link>
+			</div>
+			<div className="flex gap-2 border p-2 text-sm fixed top-2 rounded-md left-[50%] transform -translate-x-1/2  text-white">
+				<IconButton
+					activated={selectedTool === Tools.SELECTION}
+					icon={<MousePointer />}
+					onClick={() => {
+						setSelectedTool(Tools.SELECTION);
+					}}
+				/>
+				<IconButton
+					activated={selectedTool === Tools.PEN}
+					icon={<Pen />}
+					onClick={() => {
+						setSelectedTool(Tools.PEN);
+					}}
+				/>
+				<IconButton
+					activated={selectedTool === Tools.CIRCLE}
+					icon={<Circle />}
+					onClick={() => setSelectedTool(Tools.CIRCLE)}
+				/>
+				<IconButton
+					activated={selectedTool === Tools.SQUARE}
+					icon={<Square />}
+					onClick={() => {
+						setSelectedTool(Tools.SQUARE);
+					}}
+				/>
+				<IconButton
+					activated={selectedTool === Tools.Line}
+					icon={
+						<svg
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<line
+								x1="2"
+								y1="12"
+								x2="22"
+								y2="12"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							/>
+						</svg>
+					}
+					onClick={() => {
+						setSelectedTool(Tools.Line);
+					}}
+				/>
+				<IconButton
+					activated={selectedTool === Tools.ERASER}
+					icon={<Eraser />}
+					onClick={() => {
+						setSelectedTool(Tools.ERASER);
+					}}
+				/>
+			</div>
+		</>
 	);
 }
